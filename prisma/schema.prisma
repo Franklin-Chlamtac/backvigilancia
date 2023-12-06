@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @unique
+  name      String
+  cpf       String      @unique
+  cns       String      @unique
+  cbo       String
+  phone     String
+  password  String
+  role      String
+  createdAt DateTime    @default(now())
+  city      City        @relation(fields: [cityId], references: [id])
+  cityId    String
+  Procedure Procedure[]
+  Complaint Complaint[]
+}
+
+model City {
+  id         String   @id @unique
+  name       String
+  cnes       String
+  created_at DateTime @default(now())
+  users      User[]
+}
+
+model Responsible {
+  id            String          @id @unique
+  name          String
+  cpf           String          @unique
+  created_at    DateTime        @default(now())
+  Establishment Establishment[]
+}
+
+model Establishment {
+  id            String      @id @unique
+  name          String
+  document      String      @unique
+  street        String
+  neighborhood  String
+  number        Int?
+  type          String
+  created_at    DateTime    @default(now())
+  responsible   Responsible @relation(fields: [responsibleId], references: [id])
+  responsibleId String
+  Procedure     Procedure[]
+}
+
+// model Professional {
+//   id         String      @id @unique
+//   name       String
+//   cpf        String
+//   cbo        String
+//   city       City        @relation(fields: [cityId], references: [id])
+//   cityId     String
+//   created_at DateTime    @default(now())
+//   Procedure  Procedure[]
+// }
+
+model Procedure {
+  id              String        @id @unique
+  establishment   Establishment @relation(fields: [establishmentId], references: [id])
+  establishmentId String
+  procedure_code  String
+  created_at      DateTime      @default(now())
+  User            User          @relation(fields: [userId], references: [id])
+  userId          String
+}
+
+model Complaint {
+  id          String    @id @unique
+  name        String?
+  complaint   String
+  User        User      @relation(fields: [userId], references: [id])
+  userId      String
+  situation   Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  resolved_at DateTime?
+}
