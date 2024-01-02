@@ -23,12 +23,27 @@ export default {
   },
   async listProcedures(req, res) {
     try {
+      const { page, perPage } = req.query;
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(perPage) || 10;
+
+      const totalCount = await prisma.procedure.count();
+      const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const take = itemsPerPage;
       const procedures = await prisma.procedure.findMany({
+        skip,
+        take,
         orderBy: {
           created_at: "asc",
         },
       });
-      res.json(procedures);
+      res.json({
+        total: totalCount,
+        total_pages: totalPages,
+        procedures,
+      });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

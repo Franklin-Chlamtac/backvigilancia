@@ -6,6 +6,6 @@ import getSessionController from "../controllers/get-session-controller";
 const router = express.Router();
 
 router.post("/", login.login);
-router.get("/", protectedRoutes, getSessionController.handler);
+router.get("/", getSessionController.handler);
 
 export default router;

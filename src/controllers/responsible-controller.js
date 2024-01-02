@@ -26,12 +26,24 @@ export default {
   },
   async listResponsibles(req, res) {
     try {
+      const { page, perPage } = req.query;
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(perPage) || 10;
+
+      const totalCount = await prisma.responsible.count();
+      const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const take = itemsPerPage;
+
       const responsibles = await prisma.responsible.findMany({
+        skip,
+        take,
         orderBy: {
           created_at: "asc",
         },
       });
-      res.json(responsibles);
+      res.json({ total: totalCount, total_pages: totalPages, responsibles });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

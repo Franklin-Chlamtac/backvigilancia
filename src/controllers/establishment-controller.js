@@ -44,7 +44,18 @@ export default {
   },
   async listEstablishments(req, res) {
     try {
+      const { page, perPage } = req.query;
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(perPage) || 10;
+
+      const totalCount = await prisma.establishment.count();
+      const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const take = itemsPerPage;
       const establishments = await prisma.establishment.findMany({
+        skip,
+        take,
         orderBy: {
           created_at: "asc",
         },
@@ -56,7 +67,7 @@ export default {
           },
         },
       });
-      res.json(establishments);
+      res.json({ total: totalCount, total_pages: totalPages, establishments });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -84,3 +84,14 @@ model Complaint {
   created_at  DateTime  @default(now())
   resolved_at DateTime?
 }
+
+model Production {
+  id              String   @id @unique
+  cnes            String
+  competence      DateTime
+  occupation_code String
+  procedure_code  String
+  age             String
+  quantity        String
+  created_at      DateTime @default(now())
+}

@@ -27,7 +27,19 @@ export default {
 
   async listComplaints(req, res) {
     try {
+      const { page, perPage } = req.query;
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(perPage) || 10;
+
+      const totalCount = await prisma.complaint.count();
+      const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const take = itemsPerPage;
+
       const complaints = await prisma.complaint.findMany({
+        skip,
+        take,
         orderBy: {
           created_at: "asc",
         },
@@ -39,7 +51,7 @@ export default {
           },
         },
       });
-      res.json(complaints);
+      res.json({ total: totalCount, total_pages: totalPages, complaints });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

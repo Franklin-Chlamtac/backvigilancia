@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", protectedRoutes, responsibleController.createResponsible);
 
-router.get("/", protectedRoutes, responsibleController.listResponsibles);
+router.get("/", responsibleController.listResponsibles);
 
 router.patch("/:id", protectedRoutes, responsibleController.updateResponsible);
 

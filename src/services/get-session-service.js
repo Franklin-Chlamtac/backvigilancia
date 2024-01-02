@@ -11,6 +11,11 @@ export default {
         name: true,
         cpf: true,
         role: true,
+        City: {
+          select: {
+            cnes: true,
+          },
+        },
       },
     });
   },

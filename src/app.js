@@ -20,6 +20,8 @@ import procedureRoutes from "./routes/procedure-route.js";
 
 import complaintRoutes from "./routes/complaint-route.js";
 
+import productionRoutes from "./routes/production-route.js";
+
 const app = express();
 const prisma = new PrismaClient();
 
@@ -35,6 +37,7 @@ app.use("/establishments", establishmentRoutes);
 app.use("/professionals", professionalRoutes);
 app.use("/procedures", procedureRoutes);
 app.use("/complaints", complaintRoutes);
+app.use("/productions", productionRoutes);
 
 // app.use('/auth', authRoutes);
 

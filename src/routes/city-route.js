@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/", protectedRoutes, cityController.createCity);
 
-router.get("/", protectedRoutes, cityController.listCities);
+router.get("/", cityController.listCities);
 
 router.patch("/:id", protectedRoutes, cityController.updateCity);
 

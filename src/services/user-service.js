@@ -12,12 +12,15 @@ const userService = {
         where: {
           cpf,
         },
+        include: {
+          city: true,
+        },
       });
 
       if (!user) {
         return { error: "Usuário não encontrado" };
       }
-
+      console.log(user, password);
       // Compara a senha fornecida com a senha armazenada no banco de dados
       const passwordMatch = await bcrypt.compare(password, user.password);
 
@@ -30,10 +33,11 @@ const userService = {
       //   expiresIn: "1h",
       // });
       const token = encode({ id: user.id });
-
+      
       // Retorna o usuário e o token JWT
       return { user, token };
     } catch (error) {
+      console.log(error);
       return { error: "Erro ao fazer login" };
     }
   },
