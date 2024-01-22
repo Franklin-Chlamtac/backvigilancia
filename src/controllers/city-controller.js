@@ -23,29 +23,71 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
+  // async listCities(req, res) {
+  //   try {
+  //     const { page, perPage } = req.query;
+  //     if (!page || page === "all") {
+  //       const cities = await prisma.city.findMany({
+  //         orderBy: {
+  //           createdAt: "asc",
+  //         },
+  //         include: {
+  //           city: {
+  //             select: {
+  //               name: true,
+  //               cnes: true,
+  //             },
+  //           },
+  //         },
+  //       });
+
+  //       return res.json({
+  //         total: cities.length,
+  //         cities,
+  //       });
+  //     }
+  //     const pageNumber = parseInt(page) || 1;
+  //     const itemsPerPage = parseInt(perPage) || 10;
+
+  //     const totalCount = await prisma.city.count();
+  //     const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  //     const skip = (pageNumber - 1) * itemsPerPage;
+  //     const take = itemsPerPage;
+
+  //     const cities = await prisma.city.findMany({
+  //       skip,
+  //       take,
+  //       orderBy: {
+  //         created_at: "asc",
+  //       },
+  //     });
+  //     res.json({ total: totalCount, total_pages: totalPages, cities });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
   async listCities(req, res) {
     try {
       const { page, perPage } = req.query;
+
       if (!page || page === "all") {
         const cities = await prisma.city.findMany({
           orderBy: {
-            createdAt: "asc",
-          },
-          include: {
-            city: {
-              select: {
-                name: true,
-                cnes: true,
-              },
-            },
+            created_at: "asc",
           },
         });
 
+        const totalCount = cities.length;
+        const totalPages = 1;
+
         return res.json({
-          total: cities.length,
+          total: totalCount,
           cities,
+          total_pages: totalPages,
         });
       }
+
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
@@ -62,11 +104,13 @@ export default {
           created_at: "asc",
         },
       });
+
       res.json({ total: totalCount, total_pages: totalPages, cities });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
+
   async updateCity(req, res) {
     try {
       const { id } = req.params;

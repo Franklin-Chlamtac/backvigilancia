@@ -25,9 +25,66 @@ export default {
     }
   },
 
+  // async listComplaints(req, res) {
+  //   try {
+  //     const { page, perPage } = req.query;
+  //     const pageNumber = parseInt(page) || 1;
+  //     const itemsPerPage = parseInt(perPage) || 10;
+
+  //     const totalCount = await prisma.complaint.count();
+  //     const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  //     const skip = (pageNumber - 1) * itemsPerPage;
+  //     const take = itemsPerPage;
+
+  //     const complaints = await prisma.complaint.findMany({
+  //       skip,
+  //       take,
+  //       orderBy: {
+  //         created_at: "asc",
+  //       },
+  //       include: {
+  //         User: {
+  //           select: {
+  //             name: true,
+  //           },
+  //         },
+  //       },
+  //     });
+  //     res.json({ total: totalCount, total_pages: totalPages, complaints });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
+
   async listComplaints(req, res) {
     try {
       const { page, perPage } = req.query;
+
+      if (!page || page === "all") {
+        const complaints = await prisma.complaint.findMany({
+          orderBy: {
+            created_at: "asc",
+          },
+          include: {
+            User: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        const totalCount = complaints.length;
+        const totalPages = 1;
+
+        return res.json({
+          total: totalCount,
+          total_pages: totalPages,
+          complaints,
+        });
+      }
+
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
@@ -51,6 +108,7 @@ export default {
           },
         },
       });
+
       res.json({ total: totalCount, total_pages: totalPages, complaints });
     } catch (error) {
       res.status(500).json({ error: error.message });

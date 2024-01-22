@@ -28,9 +28,59 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
+  // async listProfessionals(req, res) {
+  //   try {
+  //     const professionals = await prisma.professional.findMany({
+  //       orderBy: {
+  //         created_at: "asc",
+  //       },
+  //       include: {
+  //         city: {
+  //           select: {
+  //             name: true,
+  //           },
+  //         },
+  //       },
+  //     });
+  //     res.json(professionals);
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
   async listProfessionals(req, res) {
     try {
+      const { page, perPage } = req.query;
+
+      if (!page || page === "all") {
+        const professionals = await prisma.professional.findMany({
+          orderBy: {
+            created_at: "asc",
+          },
+          include: {
+            city: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        res.json(professionals);
+        return;
+      }
+
+      const pageNumber = parseInt(page) || 1;
+      const itemsPerPage = parseInt(perPage) || 10;
+
+      const totalCount = await prisma.professional.count();
+      const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+      const skip = (pageNumber - 1) * itemsPerPage;
+      const take = itemsPerPage;
+
       const professionals = await prisma.professional.findMany({
+        skip,
+        take,
         orderBy: {
           created_at: "asc",
         },
@@ -42,7 +92,8 @@ export default {
           },
         },
       });
-      res.json(professionals);
+
+      res.json({ total: totalCount, total_pages: totalPages, professionals });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

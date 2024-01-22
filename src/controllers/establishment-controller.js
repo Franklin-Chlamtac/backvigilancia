@@ -42,9 +42,59 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
+  // async listEstablishments(req, res) {
+  //   try {
+  //     const { page, perPage } = req.query;
+  //     const pageNumber = parseInt(page) || 1;
+  //     const itemsPerPage = parseInt(perPage) || 10;
+
+  //     const totalCount = await prisma.establishment.count();
+  //     const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  //     const skip = (pageNumber - 1) * itemsPerPage;
+  //     const take = itemsPerPage;
+  //     const establishments = await prisma.establishment.findMany({
+  //       skip,
+  //       take,
+  //       orderBy: {
+  //         created_at: "asc",
+  //       },
+  //       include: {
+  //         responsible: {
+  //           select: {
+  //             name: true,
+  //           },
+  //         },
+  //       },
+  //     });
+  //     res.json({ total: totalCount, total_pages: totalPages, establishments });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
+
   async listEstablishments(req, res) {
     try {
       const { page, perPage } = req.query;
+
+      if (!page || page === "all") {
+        const establishments = await prisma.establishment.findMany({
+          orderBy: {
+            created_at: "asc",
+          },
+          include: {
+            responsible: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        res.json({ establishments });
+        return;
+      }
+
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
@@ -67,6 +117,7 @@ export default {
           },
         },
       });
+
       res.json({ total: totalCount, total_pages: totalPages, establishments });
     } catch (error) {
       res.status(500).json({ error: error.message });

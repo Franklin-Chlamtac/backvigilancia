@@ -98,7 +98,7 @@ export default {
         skip,
         take,
         orderBy: {
-          createdAt: "asc",
+          name: "asc",
         },
         include: {
           city: {

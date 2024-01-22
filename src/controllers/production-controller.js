@@ -32,9 +32,46 @@ export default {
     }
   },
 
+  // async listProductions(req, res) {
+  //   try {
+  //     const { page, perPage } = req.query;
+  //     const pageNumber = parseInt(page) || 1;
+  //     const itemsPerPage = parseInt(perPage) || 10;
+
+  //     const totalCount = await prisma.Production.count();
+  //     const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+  //     const skip = (pageNumber - 1) * itemsPerPage;
+  //     const take = itemsPerPage;
+  //     const productions = await prisma.Production.findMany({
+  //       orderBy: {
+  //         skip,
+  //         take,
+  //         created_at: "asc",
+  //       },
+  //     });
+  //     res.json({ total: totalCount, total_pages: totalPages, productions });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
+
   async listProductions(req, res) {
     try {
       const { page, perPage } = req.query;
+
+      if (!page || page === "all") {
+        const productions = await prisma.Production.findMany({
+          orderBy: {
+            created_at: "desc",
+          },
+        });
+
+        const totalCount = productions.length;
+        res.json({ total: totalCount, productions });
+        return;
+      }
+
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
@@ -43,13 +80,15 @@ export default {
 
       const skip = (pageNumber - 1) * itemsPerPage;
       const take = itemsPerPage;
+
       const productions = await prisma.Production.findMany({
         orderBy: {
-          skip,
-          take,
           created_at: "asc",
         },
+        skip,
+        take,
       });
+
       res.json({ total: totalCount, total_pages: totalPages, productions });
     } catch (error) {
       res.status(500).json({ error: error.message });
