@@ -61,7 +61,10 @@ export default {
       const { page, perPage } = req.query;
 
       if (!page || page === "all") {
-        const productions = await prisma.Production.findMany({
+        const productions = await prisma.production.findMany({
+          include: {
+            procedure: true,
+          },
           orderBy: {
             created_at: "desc",
           },
@@ -75,15 +78,18 @@ export default {
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
-      const totalCount = await prisma.Production.count();
+      const totalCount = await prisma.production.count();
       const totalPages = Math.ceil(totalCount / itemsPerPage);
 
       const skip = (pageNumber - 1) * itemsPerPage;
       const take = itemsPerPage;
 
-      const productions = await prisma.Production.findMany({
+      const productions = await prisma.production.findMany({
+        include: {
+          procedure: true,
+        },
         orderBy: {
-          created_at: "asc",
+          created_at: "desc",
         },
         skip,
         take,
@@ -94,7 +100,6 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
-
   async updateProduction(req, res) {
     try {
       const { id } = req.params;

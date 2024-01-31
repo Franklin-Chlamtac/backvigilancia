@@ -40,17 +40,18 @@ model Responsible {
 }
 
 model Establishment {
-  id            String      @id @unique
-  name          String
-  document      String      @unique
-  street        String
-  neighborhood  String
-  number        Int?
-  type          String
-  created_at    DateTime    @default(now())
-  responsible   Responsible @relation(fields: [responsibleId], references: [id])
-  responsibleId String
-  Procedure     Procedure[]
+  id              String      @id @unique
+  name            String
+  document        String      @unique
+  street          String
+  neighborhood    String
+  number          Int?
+  type            String
+  created_at      DateTime    @default(now())
+  responsible     Responsible @relation(fields: [responsibleId], references: [id])
+  responsibleId   String
+  last_inspection DateTime?
+  Procedure       Procedure[]
 }
 
 // model Professional {
@@ -85,30 +86,32 @@ model Complaint {
   resolved_at DateTime?
 }
 
+model Procedures {
+  code        String       @id @unique
+  name        String
+  gender      String
+  min_age     Int
+  max_age     Int
+  as_value    Int
+  hs_value    Int
+  ps_value    Int
+  productions Production[]
+}
+
 model Production {
-  id              String   @id @unique
+  id              String     @id @unique
   cnes            String
   competence      DateTime
   occupation_code String
-  procedure_code  String
   age             String
   quantity        String
-  created_at      DateTime @default(now())
+  created_at      DateTime   @default(now())
+  procedure       Procedures @relation(fields: [procedure_code], references: [code])
+  procedure_code  String
 }
 
 model Occupations {
   code       String @unique
   name       String
   name_clean String
-}
-
-model Procedures {
-  code     String @unique
-  name     String
-  gender   String
-  min_age  Int
-  max_age  Int
-  as_value Int
-  hs_value Int
-  ps_value Int
 }

@@ -135,6 +135,7 @@ export default {
         number,
         type,
         responsibleId,
+        last_inspection,
       } = req.body;
 
       const establishment = await prisma.establishment.update({
@@ -149,6 +150,7 @@ export default {
           number,
           type,
           responsibleId,
+          last_inspection,
         },
       });
       res.json({
@@ -159,4 +161,25 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
+  // async inspectEstablishment(req, res) {
+  //   try {
+  //     const { id } = req.params;
+  //     const { last_inspection } = req.body;
+
+  //     const establishment = await prisma.establishment.update({
+  //       where: {
+  //         id: id,
+  //       },
+  //       data: {
+  //         last_inspection,
+  //       },
+  //     });
+  //     res.json({
+  //       success: true,
+  //       message: "Estabelecimento atualizado com sucesso",
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({ error: error.message });
+  //   }
+  // },
 };
