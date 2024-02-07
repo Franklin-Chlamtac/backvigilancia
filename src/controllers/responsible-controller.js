@@ -50,7 +50,40 @@ export default {
   // },
   async listResponsibles(req, res) {
     try {
-      const { page, perPage } = req.query;
+      const { page, perPage, search } = req.query;
+
+      if (search) {
+        const searchUpperCase = search.toUpperCase();
+
+        const totalCount = await prisma.responsible.count({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+        });
+
+        const responsibles = await prisma.responsible.findMany({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+          orderBy: {
+            created_at: "asc",
+          },
+        });
+
+        return res.json({ total: totalCount, responsibles });
+      }
 
       if (!page || page === "all") {
         const responsibles = await prisma.responsible.findMany({

@@ -14,6 +14,7 @@ export default {
         number,
         type,
         responsibleId,
+        license,
       } = req.body;
 
       const establishmentAlreadyExists = await prisma.establishment.findFirst({
@@ -32,6 +33,7 @@ export default {
           number,
           type,
           responsibleId,
+          license,
         },
       });
       res.json({
@@ -136,6 +138,7 @@ export default {
         type,
         responsibleId,
         last_inspection,
+        license,
       } = req.body;
 
       const establishment = await prisma.establishment.update({
@@ -151,6 +154,7 @@ export default {
           type,
           responsibleId,
           last_inspection,
+          license,
         },
       });
       res.json({

@@ -5,10 +5,10 @@ import permissionMiddleware from "../middlewares/permission-middleware.js";
 
 const router = express.Router();
 
-router.post("/", protectedRoutes, UserController.createUser);
+router.post("/", UserController.createUser);
 
 router.get("/", UserController.listUsers);
 
-router.patch("/:id", protectedRoutes, UserController.updateUser);
+router.patch("/:id", UserController.updateUser);
 
 export default router;

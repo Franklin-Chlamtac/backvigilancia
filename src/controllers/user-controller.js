@@ -33,48 +33,59 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
-  // async listUsers(req, res) inso{
-  //   try {
-  //     const { page, perPage } = req.query;
-  //     const pageNumber = parseInt(page) || 1;
-  //     const itemsPerPage = parseInt(perPage) || 10;
 
-  //     const skip = (pageNumber - 1) * itemsPerPage;
-  //     const take = itemsPerPage;
-
-  //     const users = await prisma.user.findMany({
-  //       skip,
-  //       take,
-  //       orderBy: {
-  //         createdAt: "asc",
-  //       },
-  //       include: {
-  //         city: {
-  //           select: {
-  //             name: true,
-  //             cnes: true,
-  //           },
-  //         },
-  //       },
-  //     });
-  //     res.json(users);
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // },
   async listUsers(req, res) {
     try {
-      const { page, perPage } = req.query;
+      const { page, perPage, search } = req.query;
+
+      if (search) {
+        const searchUpperCase = search.toUpperCase();
+
+        const totalCount = await prisma.user.count({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+        });
+
+        const users = await prisma.user.findMany({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+          orderBy: {
+            created_at: "asc",
+          },
+        });
+
+        return res.json({ total: totalCount, users });
+      }
       if (!page || page === "all") {
         const users = await prisma.user.findMany({
           orderBy: {
-            createdAt: "asc",
+            created_at: "asc",
           },
           include: {
             city: {
               select: {
                 name: true,
                 cnes: true,
+              },
+            },
+            occupation: {
+              select: {
+                code: true,
+                name: true,
               },
             },
           },
@@ -105,6 +116,12 @@ export default {
             select: {
               name: true,
               cnes: true,
+            },
+          },
+          occupation: {
+            select: {
+              code: true,
+              name: true,
             },
           },
         },

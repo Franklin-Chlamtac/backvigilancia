@@ -58,7 +58,47 @@ export default {
 
   async listProductions(req, res) {
     try {
-      const { page, perPage } = req.query;
+      const { page, perPage, search } = req.query;
+
+      if (search) {
+        const searchUpperCase = search.toUpperCase();
+
+        const totalCount = await prisma.Production.count({
+          where: {
+            OR: [
+              {
+                procedure: {
+                  name: {
+                    contains: searchUpperCase,
+                  },
+                },
+              },
+            ],
+          },
+        });
+
+        const productions = await prisma.Production.findMany({
+          where: {
+            OR: [
+              {
+                procedure: {
+                  name: {
+                    contains: searchUpperCase,
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            procedure: true,
+          },
+          orderBy: {
+            created_at: "asc",
+          },
+        });
+
+        return res.json({ total: totalCount, productions });
+      }
 
       if (!page || page === "all") {
         const productions = await prisma.production.findMany({

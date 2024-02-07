@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id        String      @id @unique
-  name      String
-  cpf       String      @unique
-  cns       String      @unique
-  cbo       String
-  phone     String
-  password  String
-  role      String
-  createdAt DateTime    @default(now())
-  city      City        @relation(fields: [cityId], references: [id])
-  cityId    String
-  Procedure Procedure[]
-  Complaint Complaint[]
+  id         String       @id @unique
+  name       String
+  cpf        String       @unique
+  cns        String       @unique
+  phone      String
+  password   String
+  role       String
+  created_at DateTime     @default(now())
+  city       City         @relation(fields: [cityId], references: [id])
+  cityId     String
+  Procedure  Procedure[]
+  Complaint  Complaint[]
+  occupation Occupations? @relation(fields: [cbo], references: [code])
+  cbo        String?
 }
 
 model City {
@@ -45,12 +46,13 @@ model Establishment {
   document        String      @unique
   street          String
   neighborhood    String
-  number          Int?
+  number          Int
   type            String
   created_at      DateTime    @default(now())
   responsible     Responsible @relation(fields: [responsibleId], references: [id])
   responsibleId   String
   last_inspection DateTime?
+  license         String?
   Procedure       Procedure[]
 }
 
@@ -114,4 +116,5 @@ model Occupations {
   code       String @unique
   name       String
   name_clean String
+  users      User[]
 }

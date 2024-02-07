@@ -59,7 +59,53 @@ export default {
 
   async listComplaints(req, res) {
     try {
-      const { page, perPage } = req.query;
+      const { page, perPage, search } = req.query;
+
+      if (search) {
+        const searchUpperCase = search.toUpperCase();
+
+        const totalCount = await prisma.complaint.count({
+          where: {
+            OR: [
+              {
+                description: {
+                  contains: searchUpperCase,
+                },
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+        });
+
+        const complaints = await prisma.complaint.findMany({
+          where: {
+            OR: [
+              {
+                description: {
+                  contains: searchUpperCase,
+                },
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+          include: {
+            User: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            created_at: "asc",
+          },
+        });
+
+        return res.json({ total: totalCount, complaints });
+      }
 
       if (!page || page === "all") {
         const complaints = await prisma.complaint.findMany({
