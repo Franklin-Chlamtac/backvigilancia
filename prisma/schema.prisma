@@ -102,7 +102,6 @@ model Procedures {
 
 model Production {
   id              String     @id @unique
-  cnes            String
   competence      DateTime
   occupation_code String
   age             String
@@ -110,6 +109,7 @@ model Production {
   created_at      DateTime   @default(now())
   procedure       Procedures @relation(fields: [procedure_code], references: [code])
   procedure_code  String
+  cnes            String
 }
 
 model Occupations {

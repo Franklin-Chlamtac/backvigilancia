@@ -77,7 +77,40 @@ export default {
 
   async listEstablishments(req, res) {
     try {
-      const { page, perPage } = req.query;
+      const { page, perPage, search } = req.query;
+
+      if (search) {
+        const searchUpperCase = search.toUpperCase();
+
+        const totalCount = await prisma.establishment.count({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+        });
+
+        const establishments = await prisma.establishment.findMany({
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: searchUpperCase,
+                },
+              },
+            ],
+          },
+          orderBy: {
+            created_at: "asc",
+          },
+        });
+
+        return res.json({ total: totalCount, establishments });
+      }
 
       if (!page || page === "all") {
         const establishments = await prisma.establishment.findMany({

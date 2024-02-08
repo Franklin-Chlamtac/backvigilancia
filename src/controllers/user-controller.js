@@ -61,6 +61,11 @@ export default {
                   contains: searchUpperCase,
                 },
               },
+              {
+                cpf: {
+                  contains: search,
+                },
+              },
             ],
           },
           orderBy: {

@@ -68,7 +68,7 @@ export default {
           where: {
             OR: [
               {
-                description: {
+                complaint: {
                   contains: searchUpperCase,
                 },
                 name: {
@@ -83,7 +83,7 @@ export default {
           where: {
             OR: [
               {
-                description: {
+                complaint: {
                   contains: searchUpperCase,
                 },
                 name: {
