@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Complaint" ALTER COLUMN "resolved_at" SET DEFAULT CURRENT_TIMESTAMP;

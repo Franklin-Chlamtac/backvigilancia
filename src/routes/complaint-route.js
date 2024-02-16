@@ -6,7 +6,9 @@ const router = express.Router();
 
 router.post("/", complaintController.createComplaint);
 
-router.get("/", complaintController.listComplaints);
+router.get("/open", complaintController.listOpenComplaints);
+
+router.get("/close", complaintController.listCloseComplaints);
 
 router.patch(
   "/resolve/:id",

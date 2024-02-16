@@ -13,6 +13,7 @@ export default {
         procedure_code,
         age,
         quantity,
+        cityId,
       } = req.body;
 
       const production = await prisma.Production.create({
@@ -24,6 +25,7 @@ export default {
           procedure_code,
           age,
           quantity,
+          cityId,
         },
       });
       res.json({ success: true, message: "Produção criado com sucesso." });
@@ -32,46 +34,27 @@ export default {
     }
   },
 
-  // async listProductions(req, res) {
-  //   try {
-  //     const { page, perPage } = req.query;
-  //     const pageNumber = parseInt(page) || 1;
-  //     const itemsPerPage = parseInt(perPage) || 10;
-
-  //     const totalCount = await prisma.Production.count();
-  //     const totalPages = Math.ceil(totalCount / itemsPerPage);
-
-  //     const skip = (pageNumber - 1) * itemsPerPage;
-  //     const take = itemsPerPage;
-  //     const productions = await prisma.Production.findMany({
-  //       orderBy: {
-  //         skip,
-  //         take,
-  //         created_at: "asc",
-  //       },
-  //     });
-  //     res.json({ total: totalCount, total_pages: totalPages, productions });
-  //   } catch (error) {
-  //     res.status(500).json({ error: error.message });
-  //   }
-  // },
-
   async listProductions(req, res) {
     try {
-      const { page, perPage, search } = req.query;
+      const { page, perPage, search, cityId } = req.query;
 
       if (search) {
         const searchUpperCase = search.toUpperCase();
 
         const totalCount = await prisma.Production.count({
           where: {
-            OR: [
+            AND: [
+              { cityId: cityId },
               {
-                procedure: {
-                  name: {
-                    contains: searchUpperCase,
+                OR: [
+                  {
+                    procedure: {
+                      name: {
+                        contains: searchUpperCase,
+                      },
+                    },
                   },
-                },
+                ],
               },
             ],
           },
@@ -79,13 +62,18 @@ export default {
 
         const productions = await prisma.Production.findMany({
           where: {
-            OR: [
+            AND: [
+              { cityId: cityId },
               {
-                procedure: {
-                  name: {
-                    contains: searchUpperCase,
+                OR: [
+                  {
+                    procedure: {
+                      name: {
+                        contains: searchUpperCase,
+                      },
+                    },
                   },
-                },
+                ],
               },
             ],
           },
@@ -102,6 +90,9 @@ export default {
 
       if (!page || page === "all") {
         const productions = await prisma.production.findMany({
+          where: {
+            cityId: cityId,
+          },
           include: {
             procedure: true,
           },
@@ -118,13 +109,20 @@ export default {
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
-      const totalCount = await prisma.production.count();
+      const totalCount = await prisma.production.count({
+        where: {
+          cityId: cityId,
+        },
+      });
       const totalPages = Math.ceil(totalCount / itemsPerPage);
 
       const skip = (pageNumber - 1) * itemsPerPage;
       const take = itemsPerPage;
 
       const productions = await prisma.production.findMany({
+        where: {
+          cityId: cityId,
+        },
         include: {
           procedure: true,
         },
@@ -140,6 +138,7 @@ export default {
       res.status(500).json({ error: error.message });
     }
   },
+
   async updateProduction(req, res) {
     try {
       const { id } = req.params;

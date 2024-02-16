@@ -15,6 +15,7 @@ export default {
         type,
         responsibleId,
         license,
+        cityId,
       } = req.body;
 
       const establishmentAlreadyExists = await prisma.establishment.findFirst({
@@ -34,6 +35,7 @@ export default {
           type,
           responsibleId,
           license,
+          cityId,
         },
       });
       res.json({
@@ -77,18 +79,23 @@ export default {
 
   async listEstablishments(req, res) {
     try {
-      const { page, perPage, search } = req.query;
+      const { page, perPage, search, cityId } = req.query;
 
       if (search) {
         const searchUpperCase = search.toUpperCase();
 
         const totalCount = await prisma.establishment.count({
           where: {
-            OR: [
+            AND: [
+              { cityId: cityId },
               {
-                name: {
-                  contains: searchUpperCase,
-                },
+                OR: [
+                  {
+                    name: {
+                      contains: searchUpperCase,
+                    },
+                  },
+                ],
               },
             ],
           },
@@ -96,11 +103,16 @@ export default {
 
         const establishments = await prisma.establishment.findMany({
           where: {
-            OR: [
+            AND: [
+              { cityId: cityId },
               {
-                name: {
-                  contains: searchUpperCase,
-                },
+                OR: [
+                  {
+                    name: {
+                      contains: searchUpperCase,
+                    },
+                  },
+                ],
               },
             ],
           },
@@ -114,6 +126,9 @@ export default {
 
       if (!page || page === "all") {
         const establishments = await prisma.establishment.findMany({
+          where: {
+            cityId: cityId,
+          },
           orderBy: {
             created_at: "asc",
           },
@@ -133,12 +148,19 @@ export default {
       const pageNumber = parseInt(page) || 1;
       const itemsPerPage = parseInt(perPage) || 10;
 
-      const totalCount = await prisma.establishment.count();
+      const totalCount = await prisma.establishment.count({
+        where: {
+          cityId: cityId,
+        },
+      });
       const totalPages = Math.ceil(totalCount / itemsPerPage);
 
       const skip = (pageNumber - 1) * itemsPerPage;
       const take = itemsPerPage;
       const establishments = await prisma.establishment.findMany({
+        where: {
+          cityId: cityId,
+        },
         skip,
         take,
         orderBy: {

@@ -17,7 +17,7 @@ model User {
   role       String
   created_at DateTime     @default(now())
   city       City         @relation(fields: [cityId], references: [id])
-  cityId     String
+  cityId     String       @unique
   Procedure  Procedure[]
   Complaint  Complaint[]
   occupation Occupations? @relation(fields: [cbo], references: [code])
@@ -25,11 +25,14 @@ model User {
 }
 
 model City {
-  id         String   @id @unique
-  name       String
-  cnes       String   @unique
-  created_at DateTime @default(now())
-  users      User[]
+  id            String          @id @unique
+  name          String
+  cnes          String          @unique
+  created_at    DateTime        @default(now())
+  users         User[]
+  Establishment Establishment[]
+  Production    Production[]
+  Complaint     Complaint[]
 }
 
 model Responsible {
@@ -54,6 +57,8 @@ model Establishment {
   last_inspection DateTime?
   license         String?
   Procedure       Procedure[]
+  city            City        @relation(fields: [cityId], references: [id])
+  cityId          String
 }
 
 // model Professional {
@@ -85,7 +90,9 @@ model Complaint {
   userId      String
   situation   Boolean   @default(false)
   created_at  DateTime  @default(now())
-  resolved_at DateTime?
+  resolved_at DateTime? @default(now())
+  city        City      @relation(fields: [cityId], references: [id])
+  cityId      String
 }
 
 model Procedures {
@@ -109,6 +116,8 @@ model Production {
   created_at      DateTime   @default(now())
   procedure       Procedures @relation(fields: [procedure_code], references: [code])
   procedure_code  String
+  city            City       @relation(fields: [cityId], references: [id])
+  cityId          String
   cnes            String
 }
 
